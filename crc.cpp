@@ -115,11 +115,28 @@ initializeUART();
 		int  bytes_written  = 0;  	/* Value for storing the number of bytes written to the port */ 
     
     bytes_written = write(fd,&size,4);//количество байт прошивки
-		bytes_written = write(fd,buffer.data(),size);/* use write() to send data to port                                            *
+    usleep(3000);
+   uint32_t len=512;
+    for(uint32_t i=0;i<size;i+=512){
+      if((size-i)<512){
+        len=(size-i);
+      }
+      else{
+        len=512;
+      }
+		bytes_written = write(fd,(buffer.data()+i),len);/* use write() to send data to port                                            *
                                                                 /* "fd"                   - file descriptor pointing to the opened serial port */
                                                                 /*	"write_buffer"         - address of the buffer containing data	            */
                                                                 /* "sizeof(write_buffer)" - No of bytes to write                               */	
-		bytes_written = write(fd,&out,4);//4 байта CRC прошивки
+printf("\n  %d Bytes written to ttyACM0", bytes_written);
+if (bytes_written==-1){
+  printf("\n +ЗАПИСЬ НЕ УДАЛАСЬ+\n\n");
+  break;
+  
+}
+usleep(1000000);
+}
+  	bytes_written = write(fd,&out,4);//4 байта CRC прошивки
     printf("\n  %s written to ttyACM0",write_buffer);
 		printf("\n  %d Bytes written to ttyACM0", bytes_written);
 		printf("\n +----------------------------------+\n\n");
