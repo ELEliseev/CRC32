@@ -71,7 +71,7 @@ void initializeUART()
 int main() // определяем функцию main
 {
 
-  ifstream file("/home/evgeniy/workspace/bootCopy/Debug/bootCopy.bin", ios::binary | ios::ate);
+  ifstream file("/home/evgeniy/workspace/blink/Debug/blink.bin", ios::binary | ios::ate);
   streamsize size = file.tellg();
   file.seekg(0, ios::beg);
   vector<uint8_t> buffer(size);
