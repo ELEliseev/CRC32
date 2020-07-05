@@ -14,7 +14,7 @@
 //////////////////////end uart///////////////////////////////////////////////
 using namespace std;
 int fd;/*File Descriptor*/
-int out = 0;
+uint32_t out = 0;
 uint32_t Crc32(uint8_t *Input_Data, uint32_t LenData)
 {
   uint32_t polynom = 0x4C11DB7;
@@ -68,10 +68,38 @@ void initializeUART()
                     printf("\n  BaudRate = 115200 \n  StopBits = 1 \n  Parity   = none");
 }
 
+
+//////////////////////////////////////////////////////////////////
+const char* hex_char_to_bin(char c)
+{
+    // TODO handle default / error
+    switch(toupper(c))
+    {
+        case '0': return "0000";
+        case '1': return "0001";
+        case '2': return "0010";
+        case '3': return "0011";
+        case '4': return "0100";
+        case '5': return "0101";
+        case '6': return "0110";
+        case '7': return "0111";
+        case '8': return "1000";
+        case '9': return "1001";
+        case 'A': return "1010";
+        case 'B': return "1011";
+        case 'C': return "1100";
+        case 'D': return "1101";
+        case 'E': return "1110";
+        case 'F': return "1111";
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////
 int main() // определяем функцию main
 {
 
-  ifstream file("/home/evgeniy/workspace/blink/Debug/blink.bin", ios::binary | ios::ate);
+  ifstream file("./v2boot.bin", ios::binary | ios::ate);
   streamsize size = file.tellg();
   file.seekg(0, ios::beg);
   vector<uint8_t> buffer(size);
@@ -89,59 +117,76 @@ int main() // определяем функцию main
   out = Crc32(buffer.data(), size);
   cout << "0x" << hex << uppercase << out << "\n"; // выводим строку на консоль
   ofstream myfile;
-  myfile.open("/home/evgeniy/workspace/bootCopy/Debug/crcCode.txt");
+  myfile.open("./crcCode.txt");
   myfile << "0x" << hex << uppercase << out;
   myfile.close();
-  /////////////////uart////////////////////////////////////////
+  ///////////////////////////////////////////////////
+  myfile.open("./myversion.bin", ios::binary);
+  //myfile << buffer.data() << out;
+  myfile.write((char *)buffer.data(), size);
+  myfile.close();
+  myfile.open("./myversion.bin", ios::binary|ios::app);
+  uint8_t str; 
+
+  for(uint8_t i =4;i>0;i--){
+  
+  str = (out>>8*(i-1))&255;
+  
+  cout << (char)str<< "\n"; // выводим строку на консоль
+  myfile  << str;
+  //myfile.write((char *)str, sizeof(str));
+  }
+  myfile.close();
+//   /////////////////uart////////////////////////////////////////
 
 		
-		printf("\n +----------------------------------+");
-		printf("\n |        Serial Port Write         |");
-		printf("\n +----------------------------------+");
-    fd = open("/dev/ttyACM0",O_RDWR | O_NOCTTY  | O_NDELAY);
-//fd = open("/dev/ttyACM0",O_RDWR | O_NOCTTY | O_NDELAY);	/* ttyUSB0 is the FT232 based USB2SERIAL Converter   */
-                                                        /* O_RDWR Read/Write access to serial port           */
-                                                        /* O_NOCTTY - No terminal will control the process   */
-                                                        /* O_NDELAY -Non Blocking Mode,Does not care about-  */
-                                                        /* -the status of DCD line,Open() returns immediatly */                                        				
-        	if(fd == -1)						/* Error Checking */
-            	   printf("\n  Error! in Opening ttyACM0  ");
-        	else
-            	   printf("\n  ttyACM0 Opened Successfully ");
-initializeUART();
-/*------------------------------- Write data to serial port -----------------------------*/
+// 		printf("\n +----------------------------------+");
+// 		printf("\n |        Serial Port Write         |");
+// 		printf("\n +----------------------------------+");
+//     fd = open("/dev/ttyACM0",O_RDWR | O_NOCTTY  | O_NDELAY);
+// //fd = open("/dev/ttyACM0",O_RDWR | O_NOCTTY | O_NDELAY);	/* ttyUSB0 is the FT232 based USB2SERIAL Converter   */
+//                                                         /* O_RDWR Read/Write access to serial port           */
+//                                                         /* O_NOCTTY - No terminal will control the process   */
+//                                                         /* O_NDELAY -Non Blocking Mode,Does not care about-  */
+//                                                         /* -the status of DCD line,Open() returns immediatly */                                        				
+//         	if(fd == -1)						/* Error Checking */
+//             	   printf("\n  Error! in Opening ttyACM0  ");
+//         	else
+//             	   printf("\n  ttyACM0 Opened Successfully ");
+// initializeUART();
+// /*------------------------------- Write data to serial port -----------------------------*/
 
-		char write_buffer[] = "A";	/* Buffer containing characters to write into port	     */	
-		int  bytes_written  = 0;  	/* Value for storing the number of bytes written to the port */ 
+// 		char write_buffer[] = "A";	/* Buffer containing characters to write into port	     */	
+// 		int  bytes_written  = 0;  	/* Value for storing the number of bytes written to the port */ 
     
-    bytes_written = write(fd,&size,4);//количество байт прошивки
-    usleep(3000);
-   uint32_t len=512;
-    for(uint32_t i=0;i<size;i+=512){
-      if((size-i)<512){
-        len=(size-i);
-      }
-      else{
-        len=512;
-      }
-		bytes_written = write(fd,(buffer.data()+i),len);/* use write() to send data to port                                            *
-                                                                /* "fd"                   - file descriptor pointing to the opened serial port */
-                                                                /*	"write_buffer"         - address of the buffer containing data	            */
-                                                                /* "sizeof(write_buffer)" - No of bytes to write                               */	
-printf("\n  %d Bytes written to ttyACM0", bytes_written);
-if (bytes_written==-1){
-  printf("\n +ЗАПИСЬ НЕ УДАЛАСЬ+\n\n");
-  break;
+//     bytes_written = write(fd,&size,4);//количество байт прошивки
+//     usleep(3000);
+//    uint32_t len=512;
+//     for(uint32_t i=0;i<size;i+=512){
+//       if((size-i)<512){
+//         len=(size-i);
+//       }
+//       else{
+//         len=512;
+//       }
+// 		bytes_written = write(fd,(buffer.data()+i),len);/* use write() to send data to port                                            *
+//                                                                 /* "fd"                   - file descriptor pointing to the opened serial port */
+//                                                                 /*	"write_buffer"         - address of the buffer containing data	            */
+//                                                                 /* "sizeof(write_buffer)" - No of bytes to write                               */	
+// printf("\n  %d Bytes written to ttyACM0", bytes_written);
+// if (bytes_written==-1){
+//   printf("\n +ЗАПИСЬ НЕ УДАЛАСЬ+\n\n");
+//   break;
   
-}
-usleep(1000000);
-}
-  	bytes_written = write(fd,&out,4);//4 байта CRC прошивки
-    printf("\n  %s written to ttyACM0",write_buffer);
-		printf("\n  %d Bytes written to ttyACM0", bytes_written);
-		printf("\n +----------------------------------+\n\n");
+// }
+// usleep(1000000);
+// }
+//   	bytes_written = write(fd,&out,4);//4 байта CRC прошивки
+//     printf("\n  %s written to ttyACM0",write_buffer);
+// 		printf("\n  %d Bytes written to ttyACM0", bytes_written);
+// 		printf("\n +----------------------------------+\n\n");
 
-		close(fd);/* Close the Serial port */			               
-  /////////////////end uart///////////////////////////////////////////
+// 		close(fd);/* Close the Serial port */			               
+//   /////////////////end uart///////////////////////////////////////////
   return 0; // выходим из функции
 }
