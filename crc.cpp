@@ -99,7 +99,7 @@ const char* hex_char_to_bin(char c)
 int main() // определяем функцию main
 {
 
-  ifstream file("./v2boot.bin", ios::binary | ios::ate);
+  ifstream file("./rtos.bin", ios::binary | ios::ate);
   streamsize size = file.tellg();
   file.seekg(0, ios::beg);
   vector<uint8_t> buffer(size);
@@ -120,12 +120,14 @@ int main() // определяем функцию main
   myfile.open("./crcCode.txt");
   myfile << "0x" << hex << uppercase << out;
   myfile.close();
+ // mkdir("./dist", ~umask & 01777);
+  system("mkdir -p ./dist");
   ///////////////////////////////////////////////////
-  myfile.open("./myversion.bin", ios::binary);
+  myfile.open("./dist/myversion.bin", ios::binary);
   //myfile << buffer.data() << out;
   myfile.write((char *)buffer.data(), size);
-  myfile.close();
-  myfile.open("./myversion.bin", ios::binary|ios::app);
+ // myfile.close();
+ // myfile.open("./dist/myversion.bin", ios::binary|ios::app);
   uint8_t str; 
 
   for(uint8_t i =4;i>0;i--){
