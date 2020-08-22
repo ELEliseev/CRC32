@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
-#include <termios.h> // Contains POSIX terminal control definitions
+//#include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 //////////////////////end uart///////////////////////////////////////////////
 using namespace std;
@@ -44,55 +44,55 @@ uint32_t Crc32(uint8_t *Input_Data, uint32_t LenData)
   return CRC;
 }
 
-void initializeUART()
-{
-  /*---------- Setting the Attributes of the serial port using termios structure --------- */
+//void initializeUART()
+//{
+//  /*---------- Setting the Attributes of the serial port using termios structure --------- */
 		
-		struct termios SerialPortSettings;	/* Create the structure                          */
-		tcgetattr(fd, &SerialPortSettings);	/* Get the current attributes of the Serial port */
-		cfsetispeed(&SerialPortSettings,B115200); /* Set Read  Speed as 9600                       */
-		cfsetospeed(&SerialPortSettings,B115200); /* Set Write Speed as 9600                       */
-		SerialPortSettings.c_cflag &= ~PARENB;   /* Disables the Parity Enable bit(PARENB),So No Parity   */
-		SerialPortSettings.c_cflag &= ~CSTOPB;   /* CSTOPB = 2 Stop bits,here it is cleared so 1 Stop bit */
-	  SerialPortSettings.c_cflag &= ~CSIZE;	 /* Clears the mask for setting the data size             */
-		SerialPortSettings.c_cflag |=  CS8;      /* Set the data bits = 8                                 */
-		SerialPortSettings.c_cflag &= ~CRTSCTS;       /* No Hardware flow Control                         */
-		SerialPortSettings.c_cflag |= CREAD | CLOCAL; /* Enable receiver,Ignore Modem Control lines       */ 
-		SerialPortSettings.c_iflag &= ~(IXON | IXOFF | IXANY);          /* Disable XON/XOFF flow control both i/p and o/p */
-		SerialPortSettings.c_iflag &= ~(ICANON | ECHO | ECHOE | ISIG);  /* Non Cannonical mode                            */
-		SerialPortSettings.c_oflag &= ~OPOST;/*No Output Processing*/
+//		struct termios SerialPortSettings;	/* Create the structure                          */
+//		tcgetattr(fd, &SerialPortSettings);	/* Get the current attributes of the Serial port */
+//		cfsetispeed(&SerialPortSettings,B115200); /* Set Read  Speed as 9600                       */
+//		cfsetospeed(&SerialPortSettings,B115200); /* Set Write Speed as 9600                       */
+//		SerialPortSettings.c_cflag &= ~PARENB;   /* Disables the Parity Enable bit(PARENB),So No Parity   */
+//		SerialPortSettings.c_cflag &= ~CSTOPB;   /* CSTOPB = 2 Stop bits,here it is cleared so 1 Stop bit */
+//	  SerialPortSettings.c_cflag &= ~CSIZE;	 /* Clears the mask for setting the data size             */
+//		SerialPortSettings.c_cflag |=  CS8;      /* Set the data bits = 8                                 */
+//		SerialPortSettings.c_cflag &= ~CRTSCTS;       /* No Hardware flow Control                         */
+//		SerialPortSettings.c_cflag |= CREAD | CLOCAL; /* Enable receiver,Ignore Modem Control lines       */ 
+//		SerialPortSettings.c_iflag &= ~(IXON | IXOFF | IXANY);          /* Disable XON/XOFF flow control both i/p and o/p */
+//		SerialPortSettings.c_iflag &= ~(ICANON | ECHO | ECHOE | ISIG);  /* Non Cannonical mode                            */
+//		SerialPortSettings.c_oflag &= ~OPOST;/*No Output Processing*/
 
-		if((tcsetattr(fd,TCSANOW,&SerialPortSettings)) != 0) /* Set the attributes to the termios structure*/
-		    printf("\n  ERROR ! in Setting attributes");
-		else
-                    printf("\n  BaudRate = 115200 \n  StopBits = 1 \n  Parity   = none");
-}
+//		if((tcsetattr(fd,TCSANOW,&SerialPortSettings)) != 0) /* Set the attributes to the termios structure*/
+//		    printf("\n  ERROR ! in Setting attributes");
+//		else
+//                    printf("\n  BaudRate = 115200 \n  StopBits = 1 \n  Parity   = none");
+//}
 
 
 //////////////////////////////////////////////////////////////////
-const char* hex_char_to_bin(char c)
-{
-    // TODO handle default / error
-    switch(toupper(c))
-    {
-        case '0': return "0000";
-        case '1': return "0001";
-        case '2': return "0010";
-        case '3': return "0011";
-        case '4': return "0100";
-        case '5': return "0101";
-        case '6': return "0110";
-        case '7': return "0111";
-        case '8': return "1000";
-        case '9': return "1001";
-        case 'A': return "1010";
-        case 'B': return "1011";
-        case 'C': return "1100";
-        case 'D': return "1101";
-        case 'E': return "1110";
-        case 'F': return "1111";
-    }
-}
+//const char* hex_char_to_bin(char c)
+//{
+//    // TODO handle default / error
+//    switch(toupper(c))
+//    {
+//        case '0': return "0000";
+//        case '1': return "0001";
+//        case '2': return "0010";
+//        case '3': return "0011";
+//        case '4': return "0100";
+//        case '5': return "0101";
+//        case '6': return "0110";
+//        case '7': return "0111";
+//        case '8': return "1000";
+//        case '9': return "1001";
+//        case 'A': return "1010";
+//        case 'B': return "1011";
+//        case 'C': return "1100";
+//        case 'D': return "1101";
+//        case 'E': return "1110";
+//        case 'F': return "1111";
+//    }
+//}
 
 
 //////////////////////////////////////////////////////////////////
@@ -120,8 +120,8 @@ int main() // определяем функцию main
   myfile.open("./crcCode.txt");
   myfile << "0x" << hex << uppercase << out;
   myfile.close();
- // mkdir("./dist", ~umask & 01777);
-  system("mkdir -p ./dist");
+  mkdir("./dist");
+  //system("mkdir -p ./dist");
   ///////////////////////////////////////////////////
   myfile.open("./dist/myversion.bin", ios::binary);
   //myfile << buffer.data() << out;
